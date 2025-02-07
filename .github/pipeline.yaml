@@ -1,0 +1,42 @@
+name: Run Robot Framework Tests with Appium on Local Machine
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'  # Use sua versão de Python preferida
+
+      - name: Install dependencies
+        run: |
+          pip install robotframework
+          pip install Appium-Python-Client
+          pip install robotframework-appiumlibrary
+          
+      - name: Setup ngrok
+        run: |
+          echo "$NGROK_AUTH_TOKEN" | ngrok authtoken
+          ngrok http 4723 > ngrok.log &
+          sleep 10  # Aguarda o ngrok inicializar antes de continuar
+
+      - name: Get ngrok URL
+        id: ngrok
+        run: |
+          URL=$(curl --silent http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')
+          echo "ngrok_url=$URL" >> $GITHUB_ENV
+          
+      - name: Run Robot Framework tests via Appium
+        run: |
+          export APP_URL=$ngrok_url
+          robot --variable APP_URL:$APP_URL tests/Actions.robot
