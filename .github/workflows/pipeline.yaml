@@ -33,9 +33,10 @@ jobs:
           unzip ngrok-stable-linux-amd64.zip
           sudo mv ngrok /usr/local/bin
 
-      - name: Setup ngrok
+      - name: Setup ngrok with Auth Token
         run: |
-          ngrok authtoken $NGROK_AUTH_TOKEN  # Passando diretamente o token aqui
+          mkdir -p ~/.ngrok2
+          echo "authtoken: $NGROK_AUTH_TOKEN" > ~/.ngrok2/ngrok.yml  # Configurando o token manualmente
           ngrok http 4723 > ngrok.log &
           sleep 10  # Aguarda o ngrok inicializar antes de continuar
 
