@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup ngrok
         run: |
-          echo "$NGROK_AUTH_TOKEN" | ngrok authtoken
+          ngrok authtoken $NGROK_AUTH_TOKEN  # Passando diretamente o token aqui
           ngrok http 4723 > ngrok.log &
           sleep 10  # Aguarda o ngrok inicializar antes de continuar
 
